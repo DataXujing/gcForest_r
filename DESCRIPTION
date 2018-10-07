@@ -1,12 +1,12 @@
 Package: gcForest
 Type: Package
-Title: R for Deep Forest Model (gcForest)
-Version: 0.1.2
+Title: Deep Forest Model
+Version: 0.2.7
 Author: Xu Jing [cre]
 Maintainer: Xu Jing <274762204@qq.com>
-Description: R application programming interface (API) for Deep Forest which based on Zhi-hua Zhou and Ji Feng. Deep Forest: Towards an Alternative to Deep Neural Networks.
-            In IJCAI-2017. (<arXiv:1702.08835v2>) or Zhi-hua Zhou and Ji Feng. Deep Forest. In IJCAI-2017.(<arXiv:1702.08835>), and the Python 
-            application programming interface (API) (<https://github.com/pylablanche/gcForest>).
+Description: R application programming interface (API) for Deep Forest which based on Zhou and Feng (2017). 
+             Deep Forest: Towards an Alternative to Deep Neural Networks. (<arXiv:1702.08835v2>) or Zhou and Feng (2017). 
+             Deep Forest. (<arXiv:1702.08835>). And for the Python module 'gcForest' (<https://github.com/pylablanche/gcForest>).
 License: GPL (>= 2)
 SystemRequirements: Python (>= 3.5.0)
 Encoding: UTF-8

@@ -9,7 +9,7 @@ output:
         toc_float: true
         theme: lumen
 vignette: >
-  %\VignetteIndexEntry{Deep Forest in R}
+  %\VignetteIndexEntry{gcForest tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

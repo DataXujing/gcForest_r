@@ -11,36 +11,49 @@ and the Python application programming interface (API) (\url{https://github.com/
 }
 \examples{
 
-\dontrun{
-
 # ========= Model train=======
-sk <- NULL
 
-.onLoad <- function(libname, pkgname) {
-    sk <<- reticulate::import("sklearn", delay_load = TRUE)
-  }
+have_numpy <- reticulate::py_module_available("numpy")
+have_sklearn <- reticulate::py_module_available("sklearn")
 
-train_test_split <- sk$model_selection$train_test_split
+if(have_numpy && have_sklearn){
+   library(gcForest)
+   # req_py()
 
-data <- sk$datasets$load_iris
-iris <- data()
-X = iris$data
-y = iris$target
-data_split = train_test_split(X, y, test_size=0.33)
+   sk <- NULL
 
-X_tr <- data_split[[1]]
-X_te <- data_split[[2]]
-y_tr <- data_split[[3]]
-y_te <- data_split[[4]]
+   .onLoad <- function(libname, pkgname) {
+        sk <<- reticulate::import("sklearn", delay_load = TRUE)
+   }
+   sk <<- reticulate::import("sklearn", delay_load = TRUE)
+   train_test_split <- sk$model_selection$train_test_split
 
-gcforest_m <- gcforest(shape_1X=4L, window=2L, tolerance=0.0)
-gcforest_m$fit(X_tr, y_tr)
-gcf_model <- model_save(gcforest_m,'gcforest_model.model')
+   data <- sk$datasets$load_iris
+   iris <- data()
+   X = iris$data
+   y = iris$target
+   data_split = train_test_split(X, y, test_size=0.33)
 
-gcf <- model_load('gcforest_model.model')
-gcf$predict(X_te)
+   X_tr <- data_split[[1]]
+   X_te <- data_split[[2]]
+   y_tr <- data_split[[3]]
+   y_te <- data_split[[4]]
 
+   gcforest_m <- gcforest(shape_1X=4L, window=2L, tolerance=0.0)
+   gcforest_m$fit(X_tr, y_tr)
+   gcf_model <- model_save(gcforest_m,'gcforest_model.model')
+
+   gcf <- model_load('gcforest_model.model')
+   gcf$predict(X_te)
+
+   # learn more from gcForest package tutorial
+   utils::vignette('gcForest-docs')
+}else{
+   print('You should have the Python testing environment!')
 }
+
+
+
 }
 \seealso{
 [1] Zhi-hua Zhou and Ji Feng. Deep Forest: Towards an Alternative to Deep Neural Networks.In IJCAI-2017. (\url{https://arxiv.org/abs/1702.08835v2})

@@ -38,39 +38,51 @@
 #' @import utils
 #'
 #' @examples
-#' \dontrun{
 #'
-#' sk <- NULL
+#' have_numpy <- reticulate::py_module_available("numpy")
+#' have_sklearn <- reticulate::py_module_available("sklearn")
 #'
-#' .onLoad <- function(libname, pkgname) {
+#' if(have_numpy && have_sklearn){
+#'     library(gcForest)
+#'     req_py()
+#'
+#'     sk <- NULL
+#'
+#'     .onLoad <- function(libname, pkgname) {
+#'         sk <<- reticulate::import("sklearn", delay_load = TRUE)
+#'       }
+#'
 #'     sk <<- reticulate::import("sklearn", delay_load = TRUE)
-#'   }
+#'     train_test_split <- sk$model_selection$train_test_split
 #'
-#' train_test_split <- sk$model_selection$train_test_split
+#'     data <- sk$datasets$load_iris
+#'     iris <- data()
+#'     X = iris$data
+#'     y = iris$target
+#'     data_split = train_test_split(X, y, test_size=0.33)
 #'
-#' data <- sk$datasets$load_iris
-#' iris <- data()
-#' X = iris$data
-#' y = iris$target
-#' data_split = train_test_split(X, y, test_size=0.33)
+#'     X_tr <- data_split[[1]]
+#'     X_te <- data_split[[2]]
+#'     y_tr <- data_split[[3]]
+#'     y_te <- data_split[[4]]
 #'
-#' X_tr <- data_split[[1]]
-#' X_te <- data_split[[2]]
-#' y_tr <- data_split[[3]]
-#' y_te <- data_split[[4]]
+#'     gcforest_m <- gcforest(shape_1X=4L, window=2L, tolerance=0.0)
 #'
-#' gcforest_m <- gcforest(shape_1X=4L, window=2L, tolerance=0.0)
+#'     gcforest_m$fit(X_tr, y_tr)
 #'
-#' gcforest_m$fit(X_tr, y_tr)
-#'
-#' pred_X = gcforest_m$predict(X_te)
-#' print(pred_X)
+#'     pred_X = gcforest_m$predict(X_te)
+#'     print(pred_X)
+#' }else{
+#'     print('You should have the Python testing environment!')
 #' }
+#'
 #'
 #' @export gcforest
 gcforest <- function(shape_1X=NA, n_mgsRFtree=30L, window=NA, stride=1L,
                      cascade_test_size=0.2, n_cascadeRF=2L, n_cascadeRFtree=101L, cascade_layer=Inf,
                      min_samples_mgs=0.1, min_samples_cascade=0.05, tolerance=0.0){
+
+  req_py()
 
   # reticulate::source_python("exec/GCForest.py")
   # environment(gcForest) <- globalenv()
@@ -90,6 +102,33 @@ gcforest <- function(shape_1X=NA, n_mgsRFtree=30L, window=NA, stride=1L,
 }
 
 
+#' @title Detect Python Module
+#' @description  A function to detect Python module.
+#' @name req_py
+#' @aliases req_py
+#' @author Xu Jing
+#' @usage req_py()
+#'
+#' @import reticulate
+#' @import pkgdown
+#' @import crayon
+#' @import cli
+#'
+#' @export req_py
+req_py <- function() {
+  have_numpy <- reticulate::py_module_available("numpy")
+  have_sklearn <- reticulate::py_module_available("sklearn")
+  if (!have_numpy && !have_sklearn){
+    message(paste0(crayon::green(cli::symbol$tick),crayon::blue(" Install the requirement Python module! \n")))
+    reticulate::py_install('numpy')
+    reticulate::py_install('sklearn')
+  }else{
+    message(paste0(crayon::green(cli::symbol$tick),crayon::blue(" It is detected that you have configured the necessary Python module.! \n")))
+  }
+
+}
+
+
 #' @title R Data Transform to Python Data
 #' @description  A function to tansform R data structure to Python data structure,
 #' which based on the reticulate package.
@@ -106,16 +145,26 @@ gcforest <- function(shape_1X=NA, n_mgsRFtree=30L, window=NA, stride=1L,
 #' @import cli
 #'
 #' @examples
-#' \dontrun{
-#' r_dat <- data.frame('x1'=c(1L,2L,3L),'x2'=c(2L,3L,4L))
-#' py_dat <- gcdata(r_dat)
-#' class(py_dat)
 #'
-#' r_vec <- c('a','b','c')
-#' py_vec <- gcdata(r_vec)
-#' class(py_vec)
+#' have_numpy <- reticulate::py_module_available("numpy")
+#' have_sklearn <- reticulate::py_module_available("sklearn")
 #'
+#' if(have_numpy && have_sklearn){
+#'
+#'     library(gcForest)
+#'     req_py()
+#'
+#'     r_dat <- data.frame('x1'=c(1L,2L,3L),'x2'=c(2L,3L,4L))
+#'     py_dat <- gcdata(r_dat)
+#'     class(py_dat)
+#'
+#'     r_vec <- c('a','b','c')
+#'     py_vec <- gcdata(r_vec)
+#'     class(py_vec)
+#' }else{
+#'     print('You should have the Python testing environment!')
 #' }
+#'
 #'
 #' @export gcdata
 gcdata <- function(x){
@@ -147,34 +196,45 @@ gcdata <- function(x){
 #' @import cli
 #'
 #' @examples
-#' \dontrun{
-#' sk <- NULL
 #'
-#' .onLoad <- function(libname, pkgname) {
+#' have_numpy <- reticulate::py_module_available("numpy")
+#' have_sklearn <- reticulate::py_module_available("sklearn")
+#'
+#' if(have_numpy && have_sklearn){
+#'     library(gcForest)
+#'     req_py()
+#'
+#'     sk <- NULL
+#'
+#'     .onLoad <- function(libname, pkgname) {
+#'         sk <<- reticulate::import("sklearn", delay_load = TRUE)
+#'      }
 #'     sk <<- reticulate::import("sklearn", delay_load = TRUE)
-#'   }
+#'     train_test_split <- sk$model_selection$train_test_split
 #'
-#' train_test_split <- sk$model_selection$train_test_split
+#'     data <- sk$datasets$load_iris
+#'     iris <- data()
+#'     X = iris$data
+#'     y = iris$target
+#'     data_split = train_test_split(X, y, test_size=0.33)
 #'
-#' data <- sk$datasets$load_iris
-#' iris <- data()
-#' X = iris$data
-#' y = iris$target
-#' data_split = train_test_split(X, y, test_size=0.33)
+#'     X_tr <- data_split[[1]]
+#'     X_te <- data_split[[2]]
+#'     y_tr <- data_split[[3]]
+#'     y_te <- data_split[[4]]
 #'
-#' X_tr <- data_split[[1]]
-#' X_te <- data_split[[2]]
-#' y_tr <- data_split[[3]]
-#' y_te <- data_split[[4]]
+#'     gcforest_m <- gcforest(shape_1X=4L, window=2L, tolerance=0.0)
+#'     gcforest_m$fit(X_tr, y_tr)
+#'     gcf_model <- model_save(gcforest_m,'gcforest_model.model')
 #'
-#' gcforest_m <- gcforest(shape_1X=4L, window=2L, tolerance=0.0)
-#' gcforest_m$fit(X_tr, y_tr)
-#' gcf_model <- model_save(gcforest_m,'gcforest_model.model')
+#'     gcf <- model_load('gcforest_model.model')
+#'     gcf$predict(X_te)
 #'
-#' gcf <- model_load('gcforest_model.model')
-#' gcf$predict(X_te)
-#'
+#' }else{
+#'     print('You should have the Python testing environment!')
 #' }
+#'
+#'
 #'
 #' @export model_save
 model_save <- function(model,path){
@@ -187,7 +247,7 @@ model_save <- function(model,path){
   skjoblib <- reticulate::import('sklearn')
   joblib_r <- skjoblib$externals$joblib
 
-  cat(paste0(crayon::green(cli::symbol$tick)," Model has been saved in: ",path))
+  cat(paste0(crayon::green(cli::symbol$tick)," Model has been saved in: ",path,'/n'))
   return(joblib_r$dump(model,path))
 
 }
@@ -210,34 +270,45 @@ model_save <- function(model,path){
 #' @import cli
 #'
 #' @examples
-#' \dontrun{
-#' sk <- NULL
 #'
-#' .onLoad <- function(libname, pkgname) {
+#' have_numpy <- reticulate::py_module_available("numpy")
+#' have_sklearn <- reticulate::py_module_available("sklearn")
+#'
+#' if(have_numpy && have_sklearn){
+#'     library(gcForest)
+#'     req_py()
+#'
+#'     sk <- NULL
+#'
+#'     .onLoad <- function(libname, pkgname) {
+#'         sk <<- reticulate::import("sklearn", delay_load = TRUE)
+#'       }
 #'     sk <<- reticulate::import("sklearn", delay_load = TRUE)
-#'   }
+#'     train_test_split <- sk$model_selection$train_test_split
 #'
-#' train_test_split <- sk$model_selection$train_test_split
+#'     data <- sk$datasets$load_iris
+#'     iris <- data()
+#'     X = iris$data
+#'     y = iris$target
+#'     data_split = train_test_split(X, y, test_size=0.33)
 #'
-#' data <- sk$datasets$load_iris
-#' iris <- data()
-#' X = iris$data
-#' y = iris$target
-#' data_split = train_test_split(X, y, test_size=0.33)
+#'     X_tr <- data_split[[1]]
+#'     X_te <- data_split[[2]]
+#'     y_tr <- data_split[[3]]
+#'     y_te <- data_split[[4]]
 #'
-#' X_tr <- data_split[[1]]
-#' X_te <- data_split[[2]]
-#' y_tr <- data_split[[3]]
-#' y_te <- data_split[[4]]
+#'     gcforest_m <- gcforest(shape_1X=4L, window=2L, tolerance=0.0)
+#'     gcforest_m$fit(X_tr, y_tr)
+#'     gcf_model <- model_save(gcforest_m,'gcforest_model.model')
 #'
-#' gcforest_m <- gcforest(shape_1X=4L, window=2L, tolerance=0.0)
-#' gcforest_m$fit(X_tr, y_tr)
-#' gcf_model <- model_save(gcforest_m,'gcforest_model.model')
+#'     gcf <- model_load('gcforest_model.model')
+#'     gcf$predict(X_te)
 #'
-#' gcf <- model_load('gcforest_model.model')
-#' gcf$predict(X_te)
-#'
+#' }else{
+#'     print('You should have the Python testing environment!')
 #' }
+#'
+#'
 #'
 #' @export model_load
 model_load <- function(path){
@@ -246,10 +317,11 @@ model_load <- function(path){
   # .onLoad <- function(libname, pkgname) {
   #   skjoblib <<- reticulate::import("sklearn", delay_load = TRUE)
   # }
+
   skjoblib <- reticulate::import('sklearn')
   joblib_r <- skjoblib$externals$joblib
 
-  cat(paste0(crayon::green(cli::symbol$tick)," Model has been load from: ",path))
+  cat(paste0(crayon::green(cli::symbol$tick)," Model has been load from: ",path,'/n'))
   return(joblib_r$load(path))
 }
 
